@@ -1,0 +1,9 @@
+#!/bin/sh
+
+dir="$HOME/.local/share/remmina"
+
+profile=$(ls -1 $dir | dmenu "$@")
+
+[[ -n $profile ]] || exit
+
+remmina -c "$dir/$profile"
