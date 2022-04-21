@@ -31,7 +31,8 @@ password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" "$@")
 export PASSWORD_STORE_GPG_OPTS="--passphrase $(dmenu_password) --pinentry-mode loopback --batch"
 
 if [[ $typeit -eq 0 ]]; then
-	pass show -c "$password" 2>/dev/null && notify-send "Password was copied to clipboard."
+	tmp="$(mktemp)"
+	pass show -c "$password" 2>$tmp && notify-send "Password was copied to clipboard." || notify-send "Password was NOT copied: $(cat $tmp)"
 else
 	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | $xdotool
 fi
