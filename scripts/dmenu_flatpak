@@ -1,0 +1,9 @@
+#!/bin/sh
+
+dir="/var/lib/flatpak/exports/bin"
+
+bin=$(ls -1 $dir | dmenu "$@")
+
+[[ -n $bin ]] || exit
+
+exec "$dir/$bin"
