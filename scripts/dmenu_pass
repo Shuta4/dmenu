@@ -20,6 +20,12 @@ else
 fi
 
 prefix=${PASSWORD_STORE_DIR-~/.password-store}
+
+if [[ $(echo $(pass) | wc -l) -eq 1 ]]; then
+	notify-send "Password store is not open. Run 'pass open'"
+	exit 1
+fi
+
 password_files=( "$prefix"/**/*.gpg )
 password_files=( "${password_files[@]#"$prefix"/}" )
 password_files=( "${password_files[@]%.gpg}" )
@@ -28,11 +34,15 @@ password=$(printf '%s\n' "${password_files[@]}" | "$dmenu" "$@")
 
 [[ -n $password ]] || exit
 
-export PASSWORD_STORE_GPG_OPTS="--passphrase $(dmenu_password) --pinentry-mode loopback --batch"
-
 if [[ $typeit -eq 0 ]]; then
 	tmp="$(mktemp)"
-	pass show -c "$password" 2>$tmp && notify-send "Password was copied to clipboard." || notify-send "Password was NOT copied: $(cat $tmp)"
+	passcmd="show"
+	if [[ $(echo "$password" | grep "otp/*") != "" ]]; then
+		passcmd="otp";
+	fi
+	pass $passcmd -c "$password" 2>$tmp &&
+		notify-send "Password was copied to clipboard." ||
+		notify-send "Password was NOT copied: $(cat $tmp)"
 else
 	pass show "$password" | { IFS= read -r pass; printf %s "$pass"; } | $xdotool
 fi
