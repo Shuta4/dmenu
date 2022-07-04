@@ -21,7 +21,7 @@ fi
 
 prefix=${PASSWORD_STORE_DIR-~/.password-store}
 
-if [[ $(echo $(pass) | wc -l) -eq 1 ]]; then
+if [[ $(echo "$(pass)" | wc -l) -eq 1 ]]; then
 	notify-send "Password store is not open. Run 'pass open'"
 	exit 1
 fi
